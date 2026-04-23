@@ -1,0 +1,881 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LearnX</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        margin: 0;
+        font-family: Poppins;
+        background: #0f172a;
+        color: white;
+      }
+
+      .login {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .box {
+        background: #1e293b;
+        padding: 30px;
+        border-radius: 10px;
+        width: 300px;
+        text-align: center;
+      }
+
+      input {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: none;
+        border-radius: 5px;
+      }
+
+      button {
+        padding: 10px;
+        background: #6c63ff;
+        border: none;
+        color: white;
+        cursor: pointer;
+        border-radius: 5px;
+        margin-top: 8px;
+      }
+
+      button:hover {
+        background: #5548e0;
+        transform: scale(1.05);
+        transition: 0.3s;
+      }
+
+      #dashboard {
+        display: none;
+      }
+
+      .sidebar {
+        position: fixed;
+        width: 220px;
+        height: 100%;
+        background: #020617;
+        padding: 20px;
+      }
+
+      .sidebar p:last-child {
+        color: #ff6b6b;
+        font-weight: bold;
+        margin-top: 20px;
+      }
+
+      .sidebar p:last-child:hover {
+        color: #ff4d4d;
+        transform: translateX(5px);
+        transition: 0.3s;
+        cursor: pointer;
+      }
+
+      .sidebar p {
+        padding: 10px;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .sidebar p:hover {
+        background: #1e293b;
+        transform: translateX(6px);
+        color: #6c63ff;
+      }
+
+      .sidebar .active {
+        background: #6c63ff;
+        color: white;
+        font-weight: bold;
+      }
+
+      .slider {
+        position: relative;
+        width: 100%;
+        height: 250px;
+        overflow: hidden;
+        background: #1e293b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .slides {
+        display: flex;
+        width: 400%;
+        transition: transform 0.6s ease;
+      }
+
+      .slide {
+        width: 100%;
+        flex-shrink: 0;
+        position: relative;
+      }
+
+      .slide img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        filter: brightness(0.5);
+      }
+
+      .overlay {
+        text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7);
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 28px;
+        font-weight: bold;
+      }
+
+      .slide::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to right,
+          rgba(0, 0, 0, 0.6),
+          rgba(0, 0, 0, 0.2)
+        );
+      }
+
+      .arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.5);
+        border: none;
+        color: white;
+        font-size: 25px;
+        padding: 10px;
+        cursor: pointer;
+        border-radius: 50%;
+        z-index: 10;
+      }
+
+      .left {
+        left: 10px;
+      }
+
+      .right {
+        right: 10px;
+      }
+
+      .main {
+        margin-left: 240px;
+        padding: 20px;
+      }
+
+      .card,
+      .course {
+        background: #1e293b;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 10px;
+      }
+
+      .progress-bar {
+        background: #ddd;
+        height: 10px;
+        border-radius: 5px;
+        margin: 8px 0;
+      }
+
+      .quiz-box {
+        background: #111827;
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 10px;
+      }
+
+      .correct {
+        color: lightgreen;
+      }
+
+      .wrong {
+        color: #ff6b6b;
+      }
+
+      .stats {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        padding: 40px;
+        background: #020617;
+        flex-wrap: wrap;
+      }
+
+      .stat-card {
+        background: #1e293b;
+        padding: 20px;
+        border-radius: 10px;
+        width: 220px;
+        text-align: center;
+        flex: 1 1 200px;
+        max-width: 250px;
+      }
+
+      .stat-card h2 {
+        color: #6c63ff;
+      }
+
+      body {
+        overflow-x: hidden;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      .slides {
+        max-width: 100%;
+      }
+
+      .stats {
+        overflow-x: hidden;
+      }
+
+      .footer {
+        background: #020617;
+        color: white;
+        padding: 40px 20px 20px;
+        margin-top: 40px;
+      }
+
+      .footer-container {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      .footer-section {
+        max-width: 300px;
+      }
+
+      .footer-section h2,
+      .footer-section h3 {
+        color: #6c63ff;
+      }
+
+      .footer-section p {
+        margin: 8px 0;
+        cursor: pointer;
+      }
+
+      .footer-section p:hover {
+        text-decoration: underline;
+      }
+
+      .footer-bottom {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 14px;
+        color: #aaa;
+      }
+
+      .footer {
+        margin-left: 240px;
+      }
+
+      .dots {
+        position: absolute;
+        bottom: 15px;
+        width: 100%;
+        text-align: center;
+        z-index: 10;
+      }
+
+      .dots span {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        margin: 5px;
+        background: #bbb;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      .dots .active {
+        background: #6c63ff;
+        transform: scale(1.2);
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- HOME PAGE -->
+    <div id="homePage">
+      <!-- NAVBAR -->
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 15px 40px;
+          background: #020617;
+        "
+      >
+        <h2 style="color: #6c63ff">LearnX</h2>
+        <button onclick="goToLogin()">Login</button>
+      </div>
+      <!-- SLIDER -->
+      <div class="slider">
+        <!-- LEFT ARROW -->
+        <button class="arrow left" onclick="prevSlide()">❮</button>
+        <!-- SLIDES -->
+        <div class="slides" id="slides">
+          <div class="slide">
+            <img
+              src="https://images.unsplash.com/photo-1519389950473-47ba0277781c"
+            />
+            <div class="overlay">📚 Learn Coding Easily</div>
+          </div>
+          <div class="slide">
+            <img
+              src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f"
+            />
+            <div class="overlay">💡 Improve Your Skills</div>
+          </div>
+          <div class="slide">
+            <img
+              src="https://images.unsplash.com/photo-1501504905252-473c47e087f8"
+            />
+            <div class="overlay">🚀 Build Your Career</div>
+          </div>
+          <!-- duplicate -->
+          <div class="slide">
+            <img
+              src="https://images.unsplash.com/photo-1519389950473-47ba0277781c"
+            />
+            <div class="overlay">📚 Learn Coding Easily</div>
+          </div>
+        </div>
+        <!-- RIGHT ARROW -->
+        <button class="arrow right" onclick="nextSlide()">❯</button>
+        <!-- DOTS -->
+        <div class="dots" id="dots"></div>
+      </div>
+      <!-- STATS -->
+      <div class="stats">
+        <div class="stat-card">
+          <h2 id="statCourses">0</h2>
+          <p>Total Courses</p>
+        </div>
+        <div class="stat-card">
+          <h2 id="statUsers">500+</h2>
+          <p>Active Learners</p>
+        </div>
+        <div class="stat-card">
+          <h2 id="statCompleted">0</h2>
+          <p>Completed Courses</p>
+        </div>
+        <div class="stat-card">
+          <h2>24/7</h2>
+          <p>Learning Access</p>
+        </div>
+      </div>
+      <!-- INFO SECTION -->
+      <div style="padding: 40px; text-align: center">
+        <h1>Welcome to LearnX</h1>
+        <p>
+          LearnX helps you learn modern skills like Web Development, AI, and
+          more with quizzes and progress tracking.
+        </p>
+      </div>
+    </div>
+
+    <!-- LOGIN -->
+    <div class="login" id="loginPage" style="display: none">
+      <div class="box" id="loginBox">
+        <h2>🎓 LearnX Login</h2>
+        <input placeholder="Email" id="emailInput" />
+        <input type="password" placeholder="Password" id="passwordInput" />
+        <button onclick="login()">Login</button>
+        <button onclick="document.getElementById('loginBox').style.display='none'; document.getElementById('registerBox').style.display='block';">Register</button>
+      </div>
+      <div class="box" id="registerBox" style="display: none">
+        <h2>🎓 LearnX Register</h2>
+        <input placeholder="Name" id="regNameInput" />
+        <input placeholder="Email" id="regEmailInput" />
+        <input type="password" placeholder="Password" id="regPasswordInput" />
+        <button onclick="register()">Register</button>
+        <button onclick="document.getElementById('registerBox').style.display='none'; document.getElementById('loginBox').style.display='block';">Log In instead</button>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="dashboard" style="display: none">
+      <div class="sidebar">
+        <h2>LearnX</h2>
+        <p onclick="show('home', this)">Dashboard</p>
+        <p onclick="show('courses', this)">Courses</p>
+        <p onclick="show('analytics', this)">Analytics</p>
+        <p onclick="show('profile', this)">Profile</p>
+        <p onclick="logout()">Logout</p>
+      </div>
+      <div class="main">
+        <!-- HOME -->
+        <div id="home">
+          <h1>Dashboard</h1>
+          <div class="card">Total Courses: <span id="total">0</span></div>
+          <div class="card">Completed: <span id="completed">0</span></div>
+        </div>
+        <!-- COURSES -->
+        <div id="courses" style="display: none">
+          <h1>Courses</h1>
+          <input
+            id="searchBox"
+            placeholder="🔍 Search courses..."
+            onkeyup="filterCourses()"
+          />
+          <div id="availableCourses"></div>
+          <h2>My Courses</h2>
+          <div id="courseList"></div>
+        </div>
+        <!-- ANALYTICS -->
+        <div id="analytics" style="display: none">
+          <h1>Analytics</h1>
+          <div style="width: 350px; margin: 30px auto">
+            <canvas id="chart"></canvas>
+          </div>
+        </div>
+        <!-- PROFILE -->
+        <div id="profile" style="display: none">
+          <h1>User Profile</h1>
+          <div class="card" style="text-align: center">
+            <div
+              id="avatar"
+              style="
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                background: #6c63ff;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 30px;
+                margin: auto;
+              "
+            >
+              U
+            </div>
+            <h2 id="userName">User</h2>
+            <p id="userEmail">user@email.com</p>
+          </div>
+          <div class="card" id="profileStats"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="footer-container">
+        <div class="footer-section">
+          <h2>LearnX</h2>
+          <p>Learn modern skills with ease. Build your future with LearnX.</p>
+        </div>
+        <div class="footer-section">
+          <h3>Quick Links</h3>
+          <p onclick="goToLogin()">Login</p>
+          <p onclick="show('courses')">Courses</p>
+          <p onclick="show('analytics')">Analytics</p>
+        </div>
+        <div class="footer-section">
+          <h3>Contact</h3>
+          <p>Email: support@learnx.com</p>
+          <p>Phone: +91 12345 67890</p>
+        </div>
+      </div>
+      <div class="footer-bottom">© 2026 LearnX | All Rights Reserved</div>
+    </footer>
+
+    <script>
+      const API_URL = "/api";
+      let user = null;
+      let availableCourses = [];
+      let courses = [];
+      let timers = {};
+      let timeLeft = {};
+
+      const getHeaders = () => {
+          const token = localStorage.getItem("token");
+          return token ? { "Content-Type": "application/json", "Authorization": `Bearer ${token}` } 
+                       : { "Content-Type": "application/json" };
+      };
+
+      async function register() {
+        let name = document.getElementById("regNameInput").value;
+        let email = document.getElementById("regEmailInput").value;
+        let password = document.getElementById("regPasswordInput").value;
+
+        try {
+            let res = await fetch(`${API_URL}/auth/register`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, email, password })
+            });
+            let data = await res.json();
+            if(!res.ok) throw new Error(data.msg);
+
+            localStorage.setItem("token", data.token);
+            user = data.user;
+            loginSuccess();
+        } catch(err) {
+            alert(err.message);
+        }
+      }
+
+      async function login() {
+        let email = document.getElementById("emailInput").value;
+        let password = document.getElementById("passwordInput").value;
+
+        try {
+            let res = await fetch(`${API_URL}/auth/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password })
+            });
+            let data = await res.json();
+            if(!res.ok) throw new Error(data.msg);
+            
+            localStorage.setItem("token", data.token);
+            user = data.user;
+            loginSuccess();
+        } catch(err) {
+            alert(err.message);
+        }
+      }
+
+      async function loginSuccess() {
+        document.getElementById("homePage").style.display = "none";
+        document.getElementById("loginPage").style.display = "none";
+        document.getElementById("dashboard").style.display = "block";
+
+        document.getElementById("userName").innerText = user.name;
+        document.getElementById("userEmail").innerText = user.email;
+        document.getElementById("avatar").innerText = user.name.charAt(0).toUpperCase();
+
+        show("home");
+        await loadAvailableCourses();
+        await fetchMyCourses();
+      }
+
+      function goToLogin() {
+        document.getElementById("homePage").style.display = "none";
+        document.getElementById("loginPage").style.display = "flex";
+      }
+
+      function show(p, el) {
+        ["home", "courses", "analytics", "profile"].forEach((x) => {
+          document.getElementById(x).style.display = "none";
+        });
+
+        document.getElementById(p).style.display = "block";
+
+        document.querySelectorAll(".sidebar p").forEach((e) => {
+          e.classList.remove("active");
+        });
+
+        if (el) el.classList.add("active");
+
+        if (p === "courses") loadAvailableCourses();
+        if (p === "analytics") drawAnalytics();
+        if (p === "profile") loadProfile();
+      }
+
+      async function loadProfile() {
+        try {
+            let res = await fetch(`${API_URL}/analytics/profile`, { headers: getHeaders() });
+            let data = await res.json();
+            document.getElementById("profileStats").innerHTML = `
+              <p>📚 Enrolled Courses: ${data.enrolledCourses}</p>
+              <p>🏁 Completed Courses: ${data.completedCourses}</p>
+              <p>📊 Avg Quiz Score: ${data.avgQuizScore}%</p>
+            `;
+        } catch(err) { console.error(err); }
+      }
+
+      async function fetchMyCourses() {
+        try {
+            let res = await fetch(`${API_URL}/courses/mycourses`, { headers: getHeaders() });
+            let rawCourses = await res.json();
+            
+            courses = rawCourses.map(c => ({
+                ...c,
+                tasks: (c.tasks && c.tasks.length > 0) ? c.tasks : [
+                    { title: "Intro", done: false },
+                    { title: "Basics", done: false },
+                    { title: "Advanced", done: false }
+                ],
+                showQuiz: c.showQuiz || false,
+                quizAttempted: c.quizAttempted || false,
+                quizPassed: c.quizPassed || false,
+                answers: (c.answers && c.answers.length > 0) ? c.answers : null,
+                score: c.score || 0
+            }));
+
+            render();
+            // Upate totals on Dashboard
+            document.getElementById("total").innerText = courses.length;
+            document.getElementById("completed").innerText = courses.filter(c => c.quizPassed).length;
+        } catch(err) { console.error(err); }
+      }
+
+      async function loadAvailableCourses() {
+        try {
+            let res = await fetch(`${API_URL}/courses`);
+            availableCourses = await res.json();
+        } catch(err) { console.error(err); }
+
+        let box = document.getElementById("availableCourses");
+        let search = document.getElementById("searchBox");
+        let query = search ? search.value.toLowerCase() : "";
+
+        box.innerHTML = "";
+        availableCourses
+          .filter((c) => c.name.toLowerCase().includes(query))
+          .forEach((c) => {
+            box.innerHTML += `
+<div class="course">
+<h3>${c.name}</h3>
+<p>${c.instructor}</p>
+<button onclick="enroll(${c.id})">Enroll</button>
+</div>`;
+          });
+      }
+
+      async function enroll(id) {
+        try {
+            let res = await fetch(`${API_URL}/courses/enroll`, {
+                method: "POST",
+                headers: getHeaders(),
+                body: JSON.stringify({ courseId: id })
+            });
+            let data = await res.json();
+            if(!res.ok) throw new Error(data.msg);
+            
+            await fetchMyCourses();
+        } catch(e) {
+            alert(e.message);
+        }
+      }
+
+      async function toggleTask(ci, ti) {
+        // optimistic update
+        courses[ci].tasks[ti].done = !courses[ci].tasks[ti].done;
+        render();
+
+        try {
+            await fetch(`${API_URL}/progress/task`, {
+                method: "POST",
+                headers: getHeaders(),
+                body: JSON.stringify({ courseId: courses[ci].id, taskIndex: ti })
+            });
+        } catch(e) { console.error(e); }
+      }
+
+      function startQuiz(i) {
+        courses[i].showQuiz = true;
+        timeLeft[i] = 30;
+        startTimer(i);
+        render();
+      }
+
+      function startTimer(i) {
+        if (timers[i]) clearInterval(timers[i]);
+
+        timers[i] = setInterval(() => {
+          timeLeft[i]--;
+
+          let el = document.getElementById("timer-" + i);
+          if (el) el.innerText = "Time Left: " + timeLeft[i] + "s";
+
+          if (timeLeft[i] <= 0) {
+            clearInterval(timers[i]);
+            submitQuiz(i);
+          }
+        }, 1000);
+      }
+
+      async function submitQuiz(i) {
+        clearInterval(timers[i]);
+
+        let c = courses[i];
+        let answers = [];
+        let score = 0;
+
+        c.quiz.forEach((q, index) => {
+          let ans = document.querySelector(`input[name="q${index}-${i}"]:checked`);
+          let val = ans ? parseInt(ans.value) : -1;
+
+          answers.push(val);
+          if (val === q.ans) score++;
+        });
+
+        c.answers = answers;
+        c.score = score;
+        c.showQuiz = false;
+        c.quizAttempted = true;
+        c.quizPassed = score === c.quiz.length;
+
+        render();
+
+        try {
+            await fetch(`${API_URL}/progress/submit-quiz`, {
+                method: "POST",
+                headers: getHeaders(),
+                body: JSON.stringify({ courseId: c.id, answers, score })
+            });
+            await fetchMyCourses();
+        } catch(e) { console.error(e); }
+      }
+
+      function retryQuiz(i) {
+        let c = courses[i];
+        if (c.quizPassed) return;
+
+        c.answers = null;
+        c.quizAttempted = false;
+        c.quizPassed = false;
+        c.showQuiz = true;
+
+        timeLeft[i] = 30;
+        startTimer(i);
+
+        render();
+      }
+
+      function getProgress(c) {
+        let taskDone = c.tasks.filter((t) => t.done).length;
+        let taskPercent = (taskDone / c.tasks.length) * 80;
+
+        if (!c.quizAttempted) return Math.floor(taskPercent);
+        if (c.quizAttempted && !c.quizPassed) return Math.floor(taskPercent);
+        if (c.quizPassed) return 100;
+
+        return Math.floor(taskPercent);
+      }
+
+      function render() {
+        let list = document.getElementById("courseList");
+        list.innerHTML = "";
+
+        courses.forEach((c, i) => {
+          let progress = getProgress(c);
+
+          let tasks = c.tasks
+            .map(
+              (t, ti) => `
+<div>
+<input type="checkbox" ${t.done ? "checked" : ""} onclick="toggleTask(${i},${ti})">
+${t.title}
+</div>`,
+            )
+            .join("");
+
+          let quizHTML = "";
+
+          if (c.tasks && c.tasks.every((t) => t.done) && !c.answers && !c.showQuiz) {
+            quizHTML = `<button onclick="startQuiz(${i})">Start Quiz</button>`;
+          }
+
+          if (c.showQuiz) {
+            quizHTML = `
+<div class="quiz-box">
+<p id="timer-${i}">Time Left: ${timeLeft[i] ?? 30}s</p>
+${c.quiz
+  .map(
+    (q, qi) => `
+<p><b>${q.q}</b></p>
+${q.options
+  .map(
+    (opt, oi) => `
+<input type="radio" name="q${qi}-${i}" value="${oi}"> ${opt}<br>`,
+  )
+  .join("")}
+`,
+  )
+  .join("")}
+<button onclick="submitQuiz(${i})">Submit</button>
+</div>`;
+          }
+
+          if (c.answers && c.answers.length > 0) {
+            quizHTML += `
+<div class="quiz-box">
+  <h3>Score: ${c.score}/${c.quiz.length}</h3>
+  ${c.quizPassed ? "<p style='color:lightgreen'>🎉 Completed</p>" : `<button onclick="retryQuiz(${i})">Retry</button>`}
+</div>`;
+          }
+
+          list.innerHTML += `
+<div class="course">
+<h3>${c.name}</h3>
+<p>${progress}% completed</p>
+${tasks}
+${quizHTML}
+</div>`;
+        });
+      }
+
+      let chart;
+
+      async function drawAnalytics() {
+        let completed = 0, ongoing = 0;
+        try {
+            let res = await fetch(`${API_URL}/analytics`, { headers: getHeaders() });
+            let data = await res.json();
+            completed = data.completedCourses;
+            ongoing = data.ongoingCourses;
+        } catch(e) { console.error(e); }
+
+        if (chart) chart.destroy();
+
+        chart = new Chart(document.getElementById("chart"), {
+          type: "doughnut",
+          data: {
+            labels: ["Completed", "Ongoing"],
+            datasets: [{ data: [completed, ongoing] }],
+          },
+        });
+      }
+
+      function logout() {
+        localStorage.removeItem("token");
+        location.reload();
+      }
+
+      // Automatically check for JWT session on startup
+      window.onload = async () => {
+        let token = localStorage.getItem("token");
+        if (token) {
+           try {
+               let res = await fetch(`${API_URL}/analytics/profile`, { headers: getHeaders() });
+               if (res.ok) {
+                   // mock user to quickly skip layout reload
+                   user = { name: "User", email: "user@email.com" };
+                   loginSuccess();
+               } else {
+                   logout();
+               }
+           } catch(e) { }
+        }
+      }
+    </script>
+  </body>
+</html>
