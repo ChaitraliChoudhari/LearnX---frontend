@@ -505,7 +505,7 @@
     </footer>
 
     <script>
-      const API_URL = "https://learnx-2un4.onrender.com";
+      const API_URL = "https://learnx-2un4.onrender.com/api";
       let user = null;
       let availableCourses = [];
       let courses = [];
@@ -618,9 +618,9 @@
             courses = rawCourses.map(c => ({
                 ...c,
                 tasks: (c.tasks && c.tasks.length > 0) ? c.tasks : [
-                    { title: "Intro", done: false },
-                    { title: "Basics", done: false },
-                    { title: "Advanced", done: false }
+                    { title: "Intro", done: false, video: "https://www.w3schools.com/html/mov_bbb.mp4" },
+                    { title: "Basics", done: false, video: "https://www.w3schools.com/html/mov_bbb.mp4" },
+                    { title: "Advanced", done: false, video: "https://www.w3schools.com/html/mov_bbb.mp4" }
                 ],
                 showQuiz: c.showQuiz || false,
                 quizAttempted: c.quizAttempted || false,
@@ -678,6 +678,20 @@
       async function toggleTask(ci, ti) {
         // optimistic update
         courses[ci].tasks[ti].done = !courses[ci].tasks[ti].done;
+        render();
+
+        try {
+            await fetch(`${API_URL}/progress/task`, {
+                method: "POST",
+                headers: getHeaders(),
+                body: JSON.stringify({ courseId: courses[ci].id, taskIndex: ti })
+            });
+        } catch(e) { console.error(e); }
+      }
+
+      async function completeTask(ci, ti) {
+        if(courses[ci].tasks[ti].done) return;
+        courses[ci].tasks[ti].done = true;
         render();
 
         try {
@@ -781,9 +795,12 @@
           let tasks = c.tasks
             .map(
               (t, ti) => `
-<div>
-<input type="checkbox" ${t.done ? "checked" : ""} onclick="toggleTask(${i},${ti})">
-${t.title}
+<div style="margin-bottom: 20px;">
+<p>${t.title}</p>
+<video width="300" controls onended="completeTask(${i}, ${ti})">
+  <source src="${t.video || 'https://www.w3schools.com/html/mov_bbb.mp4'}" type="video/mp4">
+</video>
+<p style="color:${t.done ? 'lightgreen' : 'orange'}">${t.done ? '✔ Completed' : '⏳ Watch video to complete'}</p>
 </div>`,
             )
             .join("");
